@@ -1,17 +1,35 @@
-# trouble_fix
+# TroubleFix
 
-A new Flutter project.
+## Deskripsi
 
-## Getting Started
+TroubleFix adalah aplikasi pembelajaran berbasis Flutter yang dirancang untuk membantu pengguna mempelajari dan memahami proses troubleshooting pada permasalahan teknologi.
 
-This project is a starting point for a Flutter application.
+Aplikasi ini menyediakan beberapa kasus permasalahan yang dapat dipelajari dan diselesaikan melalui langkah-langkah troubleshooting.
 
-A few resources to get you started if this is your first Flutter project:
+## Tujuan
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+Aplikasi TroubleFix dibuat untuk:
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- Membantu pengguna memahami proses troubleshooting.
+- Memberikan latihan penyelesaian masalah teknologi.
+- Membuat proses belajar troubleshooting menjadi lebih interaktif.
+- Menampilkan hasil atau progres pengguna dalam menyelesaikan kasus.
+
+## Teknologi
+
+- Flutter
+- Dart
+- Visual Studio Code
+- Git & GitHub
+
+## Struktur Project
+
+Kode utama aplikasi terdapat pada folder `lib/`.
+
+```text
+lib/
+├── main.dart
+├── splash.dart
+├── login.dart
+├── dashboard.dart
+└── cases.dart

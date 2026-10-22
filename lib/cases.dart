@@ -1,5 +1,14 @@
 import 'package:flutter/material.dart';
 
+import 'case_play.dart';
+import 'progress.dart';
+
+const _biru = Color(0xFF2563EB);
+const _tinta = Color(0xFF172033);
+const _latar = Color(0xFFF5F8FC);
+const _garis = Color(0xFFE2E8F0);
+const _redup = Color(0xFF64748B);
+
 class CasesPage extends StatefulWidget {
   const CasesPage({super.key});
 
@@ -9,10 +18,12 @@ class CasesPage extends StatefulWidget {
 
 class _CasesPageState extends State<CasesPage> {
   String selectedCategory = 'Semua';
+  String query = '';
 
   final List<Map<String, dynamic>> cases = [
     {
       'title': 'Komputer tidak menyala',
+      'description': 'Telusuri masalah daya dari sumber listrik hingga komponen utama komputer.',
       'category': 'Hardware',
       'difficulty': 'Mudah',
       'score': 100,
@@ -20,6 +31,7 @@ class _CasesPageState extends State<CasesPage> {
     },
     {
       'title': 'Monitor tidak menampilkan gambar',
+      'description': 'Periksa sambungan dan penyebab layar tetap hitam atau menampilkan No Signal.',
       'category': 'Hardware',
       'difficulty': 'Sedang',
       'score': 120,
@@ -27,6 +39,8 @@ class _CasesPageState extends State<CasesPage> {
     },
     {
       'title': 'Komputer sering restart',
+      'description':
+          'Identifikasi penyebab komputer memulai ulang saat digunakan.',
       'category': 'Hardware',
       'difficulty': 'Sedang',
       'score': 120,
@@ -34,6 +48,7 @@ class _CasesPageState extends State<CasesPage> {
     },
     {
       'title': 'Tidak ada koneksi internet',
+      'description': 'Periksa koneksi jaringan dan cari tahu apakah masalahnya ada pada DNS.',
       'category': 'Jaringan',
       'difficulty': 'Sedang',
       'score': 120,
@@ -41,6 +56,8 @@ class _CasesPageState extends State<CasesPage> {
     },
     {
       'title': 'Printer tidak terdeteksi',
+      'description':
+          'Cari penyebab printer tidak dikenali dan antrean cetak yang macet.',
       'category': 'Software',
       'difficulty': 'Mudah',
       'score': 80,
@@ -50,137 +67,154 @@ class _CasesPageState extends State<CasesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final filteredCases = selectedCategory == 'Semua'
-        ? cases
-        : cases
-            .where(
-              (item) => item['category'] == selectedCategory,
-            )
-            .toList();
+    final hasilCari = cases.where((item) {
+      final cocokKategori =
+          selectedCategory == 'Semua' || item['category'] == selectedCategory;
+      final cocokTeks =
+          ('${item['title']} ${item['description']} '
+                  '${item['category']}')
+              .toLowerCase()
+              .contains(query.trim().toLowerCase());
+      return cocokKategori && cocokTeks;
+    }).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-
+      backgroundColor: _latar,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
         elevation: 0,
         title: const Text(
           'Daftar Kasus',
-          style: TextStyle(
-            color: Color(0xFF172033),
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: _tinta, fontWeight: FontWeight.w800),
         ),
-        iconTheme: const IconThemeData(
-          color: Color(0xFF172033),
-        ),
+        iconTheme: const IconThemeData(color: _tinta),
       ),
-
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 1000,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Pilih Kasus',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF172033),
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                const Text(
-                  'Pilih masalah yang ingin kamu selesaikan.',
-                  style: TextStyle(
-                    color: Color(0xFF64748B),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _FilterChip(
-                        label: 'Semua',
-                        selected: selectedCategory == 'Semua',
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = 'Semua';
-                          });
-                        },
+      body: ValueListenableBuilder<Map<String, int>>(
+        valueListenable: ProgressStore.selesai,
+        builder: (context, selesai, _) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 960),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Latihan troubleshooting',
+                      style: TextStyle(
+                        color: _tinta,
+                        fontSize: 26,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.5,
                       ),
-                      _FilterChip(
-                        label: 'Hardware',
-                        selected: selectedCategory == 'Hardware',
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = 'Hardware';
-                          });
-                        },
+                    ),
+                    const SizedBox(height: 6),
+                    const Text(
+                      'Pilih masalah, pelajari langkah diagnosis, lalu uji pemahamanmu.',
+                      style: TextStyle(color: _redup, height: 1.45),
+                    ),
+                    const SizedBox(height: 20),
+                    TextField(
+                      onChanged: (value) => setState(() => query = value),
+                      decoration: InputDecoration(
+                        hintText: 'Cari kasus atau kategori',
+                        prefixIcon: const Icon(Icons.search_rounded),
+                        filled: true,
+                        fillColor: Colors.white,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: _garis),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(color: _garis),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(14),
+                          borderSide: const BorderSide(
+                            color: _biru,
+                            width: 1.5,
+                          ),
+                        ),
                       ),
-                      _FilterChip(
-                        label: 'Software',
-                        selected: selectedCategory == 'Software',
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = 'Software';
-                          });
-                        },
-                      ),
-                      _FilterChip(
-                        label: 'Jaringan',
-                        selected: selectedCategory == 'Jaringan',
-                        onTap: () {
-                          setState(() {
-                            selectedCategory = 'Jaringan';
-                          });
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                ...filteredCases.map(
-                  (item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 14),
-                    child: _CaseCard(
-                      title: item['title'],
-                      category: item['category'],
-                      difficulty: item['difficulty'],
-                      score: item['score'],
-                      icon: item['icon'],
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => CaseDetailPage(
-                              title: item['title'],
-                              category: item['category'],
-                              difficulty: item['difficulty'],
-                              score: item['score'],
+                    ),
+                    const SizedBox(height: 14),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          for (final kategori in const [
+                            'Semua',
+                            'Hardware',
+                            'Software',
+                            'Jaringan',
+                          ])
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: _FilterChip(
+                                label: kategori,
+                                selected: selectedCategory == kategori,
+                                onTap: () =>
+                                    setState(() => selectedCategory = kategori),
+                              ),
                             ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      '${hasilCari.length} kasus tersedia',
+                      style: const TextStyle(
+                        color: _redup,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    if (hasilCari.isEmpty)
+                      const _EmptySearch()
+                    else
+                      ...hasilCari.map((item) {
+                        final title = item['title'] as String;
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: _CaseCard(
+                            title: title,
+                            description: item['description'] as String,
+                            category: item['category'] as String,
+                            difficulty: item['difficulty'] as String,
+                            score: item['score'] as int,
+                            icon: item['icon'] as IconData,
+                            isComplete: selesai.containsKey(title),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (_) => CaseDetailPage(
+                                    title: title,
+                                    description: item['description'] as String,
+                                    category: item['category'] as String,
+                                    difficulty: item['difficulty'] as String,
+                                    score: item['score'] as int,
+                                  ),
+                                ),
+                              );
+                            },
                           ),
                         );
-                      },
-                    ),
-                  ),
+                      }),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -199,34 +233,24 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(right: 10),
+    return Material(
+      color: selected ? _biru : Colors.white,
+      borderRadius: BorderRadius.circular(20),
       child: InkWell(
-        borderRadius: BorderRadius.circular(20),
         onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
         child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 18,
-            vertical: 10,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
           decoration: BoxDecoration(
-            color: selected
-                ? const Color(0xFF2563EB)
-                : Colors.white,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: selected
-                  ? const Color(0xFF2563EB)
-                  : const Color(0xFFE2E8F0),
-            ),
+            border: Border.all(color: selected ? _biru : _garis),
           ),
           child: Text(
             label,
             style: TextStyle(
-              color: selected
-                  ? Colors.white
-                  : const Color(0xFF475569),
+              color: selected ? Colors.white : _redup,
               fontWeight: FontWeight.w600,
+              fontSize: 13,
             ),
           ),
         ),
@@ -237,146 +261,181 @@ class _FilterChip extends StatelessWidget {
 
 class _CaseCard extends StatelessWidget {
   final String title;
+  final String description;
   final String category;
   final String difficulty;
   final int score;
   final IconData icon;
+  final bool isComplete;
   final VoidCallback onTap;
 
   const _CaseCard({
     required this.title,
+    required this.description,
     required this.category,
     required this.difficulty,
     required this.score,
     required this.icon,
+    required this.isComplete,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
+    return Material(
+      color: Colors.white,
       borderRadius: BorderRadius.circular(18),
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(18),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: const Color(0xFFE2E8F0),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: _garis),
           ),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 58,
-              height: 58,
-              decoration: BoxDecoration(
-                color: const Color(0xFFEFF6FF),
-                borderRadius: BorderRadius.circular(16),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFEFF6FF),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: Icon(icon, color: _biru, size: 24),
               ),
-              child: Icon(
-                icon,
-                color: const Color(0xFF2563EB),
-                size: 28,
-              ),
-            ),
-
-            const SizedBox(width: 16),
-
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF172033),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        color: _tinta,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Row(
-                    children: [
-                      _SmallTag(
-                        text: category,
-                        blue: true,
+                    const SizedBox(height: 5),
+                    Text(
+                      description,
+                      style: const TextStyle(
+                        color: _redup,
+                        fontSize: 13,
+                        height: 1.4,
                       ),
-                      const SizedBox(width: 8),
-                      _SmallTag(
-                        text: difficulty,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Row(
-                    children: [
-                      const Icon(
-                        Icons.star_rounded,
-                        size: 17,
-                        color: Color(0xFFF59E0B),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '$score poin',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Color(0xFF64748B),
+                    ),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 7,
+                      runSpacing: 7,
+                      children: [
+                        _Tag(text: category, blue: true),
+                        _Tag(text: difficulty),
+                        _Tag(
+                          text: isComplete ? 'Selesai' : 'Belum dikerjakan',
+                          color: isComplete ? const Color(0xFF047857) : _redup,
+                          background: isComplete
+                              ? const Color(0xFFECFDF5)
+                              : const Color(0xFFF1F5F9),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                      ],
+                    ),
+                    const SizedBox(height: 9),
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 4,
+                      children: [
+                        const Icon(
+                          Icons.stars_rounded,
+                          size: 16,
+                          color: Color(0xFFD97706),
+                        ),
+                        Text(
+                          '$score poin maksimal',
+                          style: const TextStyle(color: _redup, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: Color(0xFF94A3B8),
-            ),
-          ],
+              const Padding(
+                padding: EdgeInsets.only(left: 8, top: 12),
+                child: Icon(Icons.chevron_right_rounded, color: _redup),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
-class _SmallTag extends StatelessWidget {
+class _Tag extends StatelessWidget {
   final String text;
   final bool blue;
+  final Color? color;
+  final Color? background;
 
-  const _SmallTag({
+  const _Tag({
     required this.text,
     this.blue = false,
+    this.color,
+    this.background,
   });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 9,
-        vertical: 5,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
       decoration: BoxDecoration(
-        color: blue
-            ? const Color(0xFFEFF6FF)
-            : const Color(0xFFF1F5F9),
+        color: background ?? (blue ? const Color(0xFFEFF6FF) : _latar),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
         text,
         style: TextStyle(
-          fontSize: 11,
+          color: color ?? (blue ? _biru : _redup),
           fontWeight: FontWeight.w600,
-          color: blue
-              ? const Color(0xFF2563EB)
-              : const Color(0xFF64748B),
+          fontSize: 11,
         ),
+      ),
+    );
+  }
+}
+
+class _EmptySearch extends StatelessWidget {
+  const _EmptySearch();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: _garis),
+      ),
+      child: const Column(
+        children: [
+          Icon(Icons.search_off_rounded, size: 40, color: _redup),
+          SizedBox(height: 10),
+          Text(
+            'Kasus tidak ditemukan',
+            style: TextStyle(color: _tinta, fontWeight: FontWeight.w700),
+          ),
+          SizedBox(height: 4),
+          Text(
+            'Coba kata kunci atau kategori lain.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: _redup, fontSize: 13),
+          ),
+        ],
       ),
     );
   }
@@ -387,6 +446,7 @@ class CaseDetailPage extends StatelessWidget {
   final String category;
   final String difficulty;
   final int score;
+  final String description;
 
   const CaseDetailPage({
     super.key,
@@ -394,176 +454,145 @@ class CaseDetailPage extends StatelessWidget {
     required this.category,
     required this.difficulty,
     required this.score,
+    this.description = '',
   });
 
   @override
   Widget build(BuildContext context) {
-    final bool internetCase =
-        title == 'Tidak ada koneksi internet';
-
+    final detail = description.isEmpty
+        ? 'Pelajari masalah ini dan lakukan langkah troubleshooting untuk menemukan penyebab serta solusi yang tepat.'
+        : description;
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
-
+      backgroundColor: _latar,
       appBar: AppBar(
         backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
         elevation: 0,
         title: const Text(
           'Detail Kasus',
-          style: TextStyle(
-            color: Color(0xFF172033),
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: _tinta, fontWeight: FontWeight.w800),
         ),
-        iconTheme: const IconThemeData(
-          color: Color(0xFF172033),
-        ),
+        iconTheme: const IconThemeData(color: _tinta),
       ),
-
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(
-              maxWidth: 800,
-            ),
+            constraints: const BoxConstraints(maxWidth: 780),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.all(22),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                      color: const Color(0xFFE2E8F0),
-                    ),
+                    border: Border.all(color: _garis),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      const Icon(
+                        Icons.troubleshoot_rounded,
+                        color: _biru,
+                        size: 30,
+                      ),
+                      const SizedBox(height: 14),
                       Text(
                         title,
                         style: const TextStyle(
-                          fontSize: 26,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF172033),
+                          color: _tinta,
+                          fontSize: 25,
+                          height: 1.2,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-
                       const SizedBox(height: 12),
-
-                      Row(
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 8,
                         children: [
-                          _SmallTag(
-                            text: category,
-                            blue: true,
-                          ),
-                          const SizedBox(width: 8),
-                          _SmallTag(
-                            text: difficulty,
-                          ),
+                          _Tag(text: category, blue: true),
+                          _Tag(text: difficulty),
                         ],
                       ),
-
-                      const SizedBox(height: 20),
-
+                      const SizedBox(height: 18),
                       Text(
-                        internetCase
-                            ? 'Perangkat tidak dapat terhubung ke internet. Cari tahu penyebab dan langkah troubleshooting untuk mengatasi masalah jaringan.'
-                            : 'Pelajari masalah ini dan lakukan langkah troubleshooting untuk menemukan penyebab serta solusi yang tepat.',
+                        detail,
                         style: const TextStyle(
+                          color: _redup,
                           fontSize: 15,
-                          height: 1.6,
-                          color: Color(0xFF64748B),
+                          height: 1.65,
                         ),
                       ),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 20),
-
+                const SizedBox(height: 18),
                 const Text(
-                  'Tujuan Kasus',
+                  'Dalam latihan ini',
                   style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    color: _tinta,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w800,
                   ),
                 ),
-
-                const SizedBox(height: 12),
-
-                const _GoalItem(
-                  text: 'Mengidentifikasi penyebab masalah',
-                ),
-                const _GoalItem(
-                  text: 'Melakukan langkah troubleshooting',
-                ),
-                const _GoalItem(
-                  text: 'Menemukan solusi yang tepat',
-                ),
-
-                const SizedBox(height: 20),
-
+                const SizedBox(height: 10),
+                const _GoalItem(text: 'Mengidentifikasi penyebab masalah'),
+                const _GoalItem(text: 'Memilih langkah pemeriksaan yang tepat'),
+                const _GoalItem(text: 'Memahami alasan di balik solusi'),
+                const SizedBox(height: 16),
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
                     color: const Color(0xFFEFF6FF),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
                     children: [
-                      const Icon(
-                        Icons.stars_rounded,
-                        color: Color(0xFF2563EB),
-                        size: 30,
+                      const Icon(Icons.stars_rounded, color: _biru, size: 28),
+                      const SizedBox(width: 12),
+                      const Expanded(
+                        child: Text(
+                          'Skor maksimal',
+                          style: TextStyle(color: _redup),
+                        ),
                       ),
-                      const SizedBox(width: 14),
-                      Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                        children: [
-                          const Text(
-                            'Estimasi Poin',
-                            style: TextStyle(
-                              color: Color(0xFF64748B),
-                            ),
-                          ),
-                          const SizedBox(height: 3),
-                          Text(
-                            '$score poin',
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF2563EB),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        '$score poin',
+                        style: const TextStyle(
+                          color: _biru,
+                          fontWeight: FontWeight.w800,
+                          fontSize: 18,
+                        ),
                       ),
                     ],
                   ),
                 ),
-
-                const SizedBox(height: 24),
-
+                const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
-                  height: 54,
-                  child: ElevatedButton(
-                    onPressed: () {},
+                  height: 52,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) =>
+                              CasePlayPage(title: title, score: score),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.play_arrow_rounded),
+                    label: const Text('MULAI KASUS'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF2563EB),
+                      backgroundColor: _biru,
                       foregroundColor: Colors.white,
+                      textStyle: const TextStyle(fontWeight: FontWeight.w700),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: const Text(
-                      'MULAI KASUS',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
@@ -580,28 +609,20 @@ class CaseDetailPage extends StatelessWidget {
 class _GoalItem extends StatelessWidget {
   final String text;
 
-  const _GoalItem({
-    required this.text,
-  });
+  const _GoalItem({required this.text});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: 9),
       child: Row(
         children: [
-          const Icon(
-            Icons.check_circle_rounded,
-            color: Color(0xFF2563EB),
-            size: 22,
-          ),
+          const Icon(Icons.check_circle_rounded, color: _biru, size: 19),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
-                color: Color(0xFF475569),
-              ),
+              style: const TextStyle(color: _redup, height: 1.4),
             ),
           ),
         ],

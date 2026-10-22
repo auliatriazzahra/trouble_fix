@@ -1,0 +1,126 @@
+<!-- ============================================================
+  DASHBOARD MOODLE: kartu cantik + judul bisa diklik (buka/tutup)
+  Tempel di: Site administration > Appearance > Additional HTML
+  Kolom: "Before end of BODY"
+  ============================================================ -->
+
+<style>
+/* ---------- Kartu block ---------- */
+#page-my-index section.block {
+  --nc: #6366f1;
+  --nc-icon: "📌";
+  border: 0 !important;
+  border-left: 7px solid var(--nc) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 6px 18px rgba(30, 41, 59, 0.10);
+  overflow: hidden;
+  background: #ffffff;
+  transition: transform .2s ease, box-shadow .2s ease;
+}
+#page-my-index section.block:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(30, 41, 59, 0.16);
+}
+
+/* ---------- Warna + ikon per block ---------- */
+#page-my-index section.block[data-block="timeline"],
+#page-my-index section.block.block_timeline { --nc: #6366f1; --nc-icon: "⏰"; }
+
+#page-my-index section.block[data-block="calendar_month"],
+#page-my-index section.block.block_calendar_month { --nc: #0ea5e9; --nc-icon: "📅"; }
+
+#page-my-index section.block[data-block="recentlyaccesseditems"],
+#page-my-index section.block.block_recentlyaccesseditems { --nc: #14b8a6; --nc-icon: "🕘"; }
+
+#page-my-index section.block[data-block="badges"],
+#page-my-index section.block.block_badges { --nc: #f59e0b; --nc-icon: "🏅"; }
+
+#page-my-index section.block[data-block="calendar_upcoming"],
+#page-my-index section.block.block_calendar_upcoming { --nc: #ec4899; --nc-icon: "🔔"; }
+
+#page-my-index section.block[data-block="myoverview"],
+#page-my-index section.block.block_myoverview { --nc: #8b5cf6; --nc-icon: "📚"; }
+
+/* ---------- Judul (yang diklik) ---------- */
+#page-my-index section.block .card-title {
+  display: inline-block !important;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 800;
+  font-size: 1.2rem;
+  margin: 0;
+  color: #1e293b;
+}
+#page-my-index section.block .card-title::before {
+  content: var(--nc-icon);
+  margin-right: 10px;
+}
+#page-my-index section.block .card-title::after {
+  content: "▾";
+  margin-left: 10px;
+  font-size: .8em;
+  color: var(--nc);
+}
+#page-my-index section.block.nc-collapsed .card-title::after { content: "▸"; }
+#page-my-index section.block .card-title:hover { color: var(--nc); }
+
+/* ---------- Isi block saat ditutup ---------- */
+#page-my-index section.block.nc-collapsed .card-body > .content,
+#page-my-index section.block.nc-collapsed .card-body > .card-text {
+  display: none !important;
+}
+#page-my-index section.block:not(.nc-collapsed) .card-body > .content,
+#page-my-index section.block:not(.nc-collapsed) .card-body > .card-text {
+  animation: ncFade .25s ease;
+}
+@keyframes ncFade {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+
+<script>
+(function () {
+  // Isi dengan nama block yang mau TERBUKA dari awal.
+  // Contoh: ['myoverview']  |  Kosong [] = semua tertutup.
+  var OPEN_BY_DEFAULT = [];
+
+  function setup() {
+    if (!document.body || document.body.id !== 'page-my-index') { return; }
+    var blocks = document.querySelectorAll('#page-my-index section.block');
+    blocks.forEach(function (block) {
+      if (block.dataset.ncInit) { return; }
+      var title = block.querySelector('.card-title');
+      if (!title) { return; }
+      block.dataset.ncInit = '1';
+
+      var name = block.getAttribute('data-block') || '';
+      if (OPEN_BY_DEFAULT.indexOf(name) === -1) {
+        block.classList.add('nc-collapsed');
+      }
+
+      title.setAttribute('role', 'button');
+      title.setAttribute('tabindex', '0');
+      title.setAttribute('title', 'Klik untuk buka / tutup');
+      title.setAttribute('aria-expanded', block.classList.contains('nc-collapsed') ? 'false' : 'true');
+
+      function toggle() {
+        var closed = block.classList.toggle('nc-collapsed');
+        title.setAttribute('aria-expanded', closed ? 'false' : 'true');
+      }
+      title.addEventListener('click', toggle);
+      title.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setup);
+  } else {
+    setup();
+  }
+  setTimeout(setup, 1000);
+  setTimeout(setup, 2500);
+})();
+</script>

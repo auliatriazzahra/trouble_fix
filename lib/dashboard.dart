@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app_theme.dart';
 import 'cases.dart';
 import 'progress.dart';
 import 'riwayat.dart';
@@ -203,10 +204,9 @@ class DashboardPage extends StatelessWidget {
                 children: [
                   Text(
                     'Halo, $nama 👋',
-                    style: const TextStyle(
-                      color: _tinta,
+                    style: AppTextStyles.heading(
                       fontSize: 28,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       letterSpacing: -0.7,
                     ),
                   ),
@@ -260,12 +260,11 @@ class DashboardPage extends StatelessWidget {
                     },
                   ),
                   const SizedBox(height: 30),
-                  const Text(
+                  Text(
                     'Menu belajar',
-                    style: TextStyle(
-                      color: _tinta,
+                    style: AppTextStyles.heading(
                       fontSize: 20,
-                      fontWeight: FontWeight.w800,
+                      fontWeight: FontWeight.w700,
                       letterSpacing: -0.3,
                     ),
                   ),

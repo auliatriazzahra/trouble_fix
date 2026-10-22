@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app_theme.dart';
 import 'progress.dart';
 
 String _formatWaktu(DateTime t) {
@@ -46,7 +47,7 @@ class RiwayatPage extends StatelessWidget {
         valueListenable: ProgressStore.riwayat,
         builder: (context, daftar, _) {
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 800),
@@ -76,13 +77,12 @@ class _Isi extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'Ringkasan belajar',
-          style: TextStyle(
+          style: AppTextStyles.heading(
             fontSize: 24,
-            fontWeight: FontWeight.w800,
+            fontWeight: FontWeight.w700,
             letterSpacing: -0.4,
-            color: Color(0xFF172033),
           ),
         ),
         const SizedBox(height: 6),
@@ -111,14 +111,7 @@ class _Isi extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        const Text(
-          'Aktivitas terbaru',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF172033),
-          ),
-        ),
+        Text('Aktivitas terbaru', style: AppTextStyles.heading(fontSize: 20)),
         const SizedBox(height: 14),
         for (final item in daftar)
           Padding(

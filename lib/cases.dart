@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app_theme.dart';
 import 'case_play.dart';
 import 'progress.dart';
 
@@ -101,12 +102,11 @@ class _CasesPageState extends State<CasesPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Latihan troubleshooting',
-                      style: TextStyle(
-                        color: _tinta,
+                      style: AppTextStyles.heading(
                         fontSize: 26,
-                        fontWeight: FontWeight.w800,
+                        fontWeight: FontWeight.w700,
                         letterSpacing: -0.5,
                       ),
                     ),
@@ -501,11 +501,10 @@ class CaseDetailPage extends StatelessWidget {
                       const SizedBox(height: 14),
                       Text(
                         title,
-                        style: const TextStyle(
-                          color: _tinta,
+                        style: AppTextStyles.heading(
                           fontSize: 25,
                           height: 1.2,
-                          fontWeight: FontWeight.w800,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                       const SizedBox(height: 12),
@@ -530,12 +529,11 @@ class CaseDetailPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 18),
-                const Text(
+                Text(
                   'Dalam latihan ini',
-                  style: TextStyle(
-                    color: _tinta,
+                  style: AppTextStyles.heading(
                     fontSize: 18,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: 10),

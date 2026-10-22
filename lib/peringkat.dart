@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app_theme.dart';
 import 'progress.dart';
 
 const _biru = Color(0xFF2563EB);
@@ -81,10 +82,10 @@ class PeringkatPage extends StatelessWidget {
                                 const SizedBox(height: 4),
                                 Text(
                                   '$dikerjakan dari $total kasus selesai',
-                                  style: const TextStyle(
+                                  style: AppTextStyles.heading(
                                     color: Colors.white,
                                     fontSize: 19,
-                                    fontWeight: FontWeight.w800,
+                                    fontWeight: FontWeight.w700,
                                   ),
                                 ),
                               ],
@@ -124,11 +125,10 @@ class PeringkatPage extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 28),
-                    const Text(
+                    Text(
                       'Target pencapaian',
-                      style: TextStyle(
-                        color: _tinta,
-                        fontWeight: FontWeight.w800,
+                      style: AppTextStyles.heading(
+                        fontWeight: FontWeight.w700,
                         fontSize: 19,
                       ),
                     ),

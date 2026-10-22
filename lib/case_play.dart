@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import 'app_theme.dart';
 import 'progress.dart';
 
 class CaseStep {
@@ -320,11 +321,10 @@ class _CasePlayPageState extends State<CasePlayPage> {
           ),
           child: Text(
             step.pertanyaan,
-            style: const TextStyle(
+            style: AppTextStyles.heading(
               fontSize: 18,
               height: 1.5,
-              fontWeight: FontWeight.w700,
-              color: Color(0xFF172033),
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),
@@ -441,10 +441,9 @@ class _CasePlayPageState extends State<CasePlayPage> {
         const SizedBox(height: 22),
         Text(
           lulus ? 'Kasus Selesai!' : 'Coba Lagi Ya',
-          style: const TextStyle(
+          style: AppTextStyles.heading(
             fontSize: 26,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF172033),
+            fontWeight: FontWeight.w700,
           ),
         ),
         const SizedBox(height: 8),

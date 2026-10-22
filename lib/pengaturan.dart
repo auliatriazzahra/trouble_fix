@@ -48,11 +48,27 @@ class PengaturanPage extends StatelessWidget {
     );
 
     if (yakin == true) {
-      ProgressStore.reset();
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Progress berhasil direset.')),
+      try {
+        await ProgressStore.reset();
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Progress berhasil direset.')),
+          );
+        }
+      } catch (error, stackTrace) {
+        FlutterError.reportError(
+          FlutterErrorDetails(
+            exception: error,
+            stack: stackTrace,
+            library: 'TroubleFix',
+            context: ErrorDescription('while resetting learning progress'),
+          ),
         );
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Progress gagal direset. Coba lagi.')),
+          );
+        }
       }
     }
   }
@@ -148,7 +164,7 @@ class PengaturanPage extends StatelessWidget {
                 _Baris(
                   ikon: Icons.delete_outline_rounded,
                   judul: 'Reset Progress',
-                  subjudul: 'Hapus skor terbaik dan riwayat di sesi ini',
+                  subjudul: 'Hapus skor, riwayat, dan status materi',
                   onTap: () => _reset(context),
                   merah: true,
                 ),
@@ -170,8 +186,8 @@ class PengaturanPage extends StatelessWidget {
                       Expanded(
                         child: Text(
                           'TroubleFix berjalan tanpa login atau database. '
-                          'Progress disimpan sementara di memori dan akan '
-                          'direset saat aplikasi ditutup.',
+                          'Skor dan riwayat tersimpan selama sesi; status '
+                          'materi disimpan secara lokal di perangkat.',
                           style: TextStyle(
                             color: _redup,
                             fontSize: 13,

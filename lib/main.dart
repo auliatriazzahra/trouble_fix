@@ -4,7 +4,20 @@ import 'app_theme.dart';
 import 'dashboard.dart';
 import 'progress.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await ProgressStore.muatMateriSelesai();
+  } catch (error, stackTrace) {
+    FlutterError.reportError(
+      FlutterErrorDetails(
+        exception: error,
+        stack: stackTrace,
+        library: 'TroubleFix',
+        context: ErrorDescription('while loading saved learning progress'),
+      ),
+    );
+  }
   runApp(const TroubleFixApp());
 }
 

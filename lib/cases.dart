@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 
 import 'app_theme.dart';
 import 'case_play.dart';
+import 'materi.dart';
+import 'materi_data.dart';
 import 'progress.dart';
 
 const _biru = Color(0xFF2563EB);
@@ -13,15 +15,7 @@ const _redup = Color(0xFF64748B);
 class CasesPage extends StatefulWidget {
   const CasesPage({super.key});
 
-  @override
-  State<CasesPage> createState() => _CasesPageState();
-}
-
-class _CasesPageState extends State<CasesPage> {
-  String selectedCategory = 'Semua';
-  String query = '';
-
-  final List<Map<String, dynamic>> cases = [
+  static final List<Map<String, dynamic>> cases = [
     {
       'title': 'Komputer tidak menyala',
       'description': 'Telusuri masalah daya dari sumber listrik hingga komponen utama komputer.',
@@ -66,9 +60,40 @@ class _CasesPageState extends State<CasesPage> {
     },
   ];
 
+  static void openCase(
+    BuildContext context,
+    String title, {
+    bool replaceCurrentRoute = false,
+  }) {
+    final item = cases.firstWhere((item) => item['title'] == title);
+    final route = MaterialPageRoute<void>(
+      builder: (_) => CaseDetailPage(
+        title: item['title'] as String,
+        description: item['description'] as String,
+        category: item['category'] as String,
+        difficulty: item['difficulty'] as String,
+        score: item['score'] as int,
+      ),
+    );
+
+    if (replaceCurrentRoute) {
+      Navigator.pushReplacement(context, route);
+    } else {
+      Navigator.push(context, route);
+    }
+  }
+
+  @override
+  State<CasesPage> createState() => _CasesPageState();
+}
+
+class _CasesPageState extends State<CasesPage> {
+  String selectedCategory = 'Semua';
+  String query = '';
+
   @override
   Widget build(BuildContext context) {
-    final hasilCari = cases.where((item) {
+    final hasilCari = CasesPage.cases.where((item) {
       final cocokKategori =
           selectedCategory == 'Semua' || item['category'] == selectedCategory;
       final cocokTeks =
@@ -192,20 +217,7 @@ class _CasesPageState extends State<CasesPage> {
                             score: item['score'] as int,
                             icon: item['icon'] as IconData,
                             isComplete: selesai.containsKey(title),
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (_) => CaseDetailPage(
-                                    title: title,
-                                    description: item['description'] as String,
-                                    category: item['category'] as String,
-                                    difficulty: item['difficulty'] as String,
-                                    score: item['score'] as int,
-                                  ),
-                                ),
-                              );
-                            },
+                            onTap: () => CasesPage.openCase(context, title),
                           ),
                         );
                       }),
@@ -540,6 +552,38 @@ class CaseDetailPage extends StatelessWidget {
                 const _GoalItem(text: 'Mengidentifikasi penyebab masalah'),
                 const _GoalItem(text: 'Memilih langkah pemeriksaan yang tepat'),
                 const _GoalItem(text: 'Memahami alasan di balik solusi'),
+                const SizedBox(height: 18),
+                Text(
+                  'Pelajari Materi Terkait',
+                  style: AppTextStyles.heading(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                const Text(
+                  'Bangun pemahaman sebelum memulai latihan kasus ini.',
+                  style: TextStyle(color: _redup, height: 1.45, fontSize: 13),
+                ),
+                const SizedBox(height: 12),
+                for (final materi in materiUntukKasus(title)) ...[
+                  MateriTerkaitCard(
+                    materi: materi,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute<void>(
+                          builder: (_) => MateriDetailPage(
+                            materi: materi,
+                            onKembaliKeKasus: (materiContext) =>
+                                Navigator.pop(materiContext),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                ],
                 const SizedBox(height: 16),
                 Container(
                   width: double.infinity,

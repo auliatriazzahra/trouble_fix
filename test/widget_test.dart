@@ -4,23 +4,30 @@ import 'package:trouble_fix/case_play.dart';
 import 'package:trouble_fix/cases.dart';
 import 'package:trouble_fix/dashboard.dart';
 import 'package:trouble_fix/main.dart';
+import 'package:trouble_fix/materi.dart';
 import 'package:trouble_fix/progress.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   testWidgets('dashboard and case list fit a narrow viewport', (
     WidgetTester tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
     tester.view.physicalSize = const Size(360, 800);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.resetPhysicalSize);
-    ProgressStore.reset();
+    await ProgressStore.reset();
 
     await tester.pumpWidget(const TroubleFixApp());
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
 
-    final menuKasus = find.text('Daftar Kasus');
-    await tester.ensureVisible(menuKasus);
+    await tester.tap(find.byIcon(Icons.menu_rounded));
+    await tester.pumpAndSettle();
+    final menuKasus = find.descendant(
+      of: find.byType(Drawer),
+      matching: find.text('Jelajahi Kasus'),
+    );
     await tester.tap(menuKasus);
     await tester.pumpAndSettle();
     expect(tester.takeException(), isNull);
@@ -36,14 +43,15 @@ void main() {
   testWidgets('opens the dashboard without requiring login', (
     WidgetTester tester,
   ) async {
+    SharedPreferences.setMockInitialValues({});
     await tester.pumpWidget(const TroubleFixApp());
 
     expect(find.byType(DashboardPage), findsOneWidget);
-    expect(find.text('Halo, Pengguna 👋'), findsOneWidget);
+    expect(find.text('Hai, Pengguna!'), findsOneWidget);
     expect(find.text('LOGIN'), findsNothing);
     expect(find.text('DAFTAR'), findsNothing);
 
-    final menuKasus = find.text('Daftar Kasus');
+    final menuKasus = find.text('Jelajahi Kasus');
     await tester.ensureVisible(menuKasus);
     await tester.tap(menuKasus);
     await tester.pumpAndSettle();
@@ -54,6 +62,26 @@ void main() {
     final caseTitle = find.text('Komputer tidak menyala');
     await tester.ensureVisible(caseTitle);
     await tester.tap(caseTitle);
+    await tester.pumpAndSettle();
+    expect(find.byType(CaseDetailPage), findsOneWidget);
+    expect(find.text('Pelajari Materi Terkait'), findsOneWidget);
+    expect(find.text('Alur Pemeriksaan Daya PC'), findsOneWidget);
+    expect(find.text('Mengenali Peran PSU'), findsOneWidget);
+
+    final materi = find.text('Alur Pemeriksaan Daya PC');
+    await tester.ensureVisible(materi);
+    await tester.tap(materi);
+    await tester.pumpAndSettle();
+    expect(find.byType(MateriDetailPage), findsOneWidget);
+    expect(find.text('Langkah analisis dan penyelesaian'), findsOneWidget);
+
+    await tester.tap(find.text('Tandai selesai dipelajari'));
+    await tester.pumpAndSettle();
+    expect(ProgressStore.materiSelesai.value, contains('alur-daya-pc'));
+    await ProgressStore.muatMateriSelesai();
+    expect(ProgressStore.materiSelesai.value, contains('alur-daya-pc'));
+
+    await tester.tap(find.text('Kembali ke studi kasus terkait'));
     await tester.pumpAndSettle();
     expect(find.byType(CaseDetailPage), findsOneWidget);
 
@@ -85,6 +113,32 @@ void main() {
     await tester.tap(backToDashboard);
     await tester.pumpAndSettle();
     expect(find.byType(DashboardPage), findsOneWidget);
+  });
+
+  testWidgets('materials can be opened directly and return to their case', (
+    WidgetTester tester,
+  ) async {
+    SharedPreferences.setMockInitialValues({});
+    await tester.pumpWidget(const TroubleFixApp());
+    await tester.pumpAndSettle();
+
+    final menuMateri = find.text('Materi Pembelajaran');
+    await tester.ensureVisible(menuMateri);
+    await tester.tap(menuMateri);
+    await tester.pumpAndSettle();
+    expect(find.byType(MateriPage), findsOneWidget);
+    expect(find.text('10 materi tersedia'), findsOneWidget);
+
+    final materi = find.text('DNS dan Resolusi Nama Domain');
+    await tester.ensureVisible(materi);
+    await tester.tap(materi);
+    await tester.pumpAndSettle();
+    expect(find.byType(MateriDetailPage), findsOneWidget);
+
+    await tester.tap(find.text('Kembali ke studi kasus terkait'));
+    await tester.pumpAndSettle();
+    expect(find.byType(CaseDetailPage), findsOneWidget);
+    expect(find.text('Tidak ada koneksi internet'), findsOneWidget);
   });
 }
 
